@@ -5,6 +5,7 @@ from typing import Any, Optional
 from pydantic import BaseModel, Field
 
 from ..auth import API_V1, API_V2
+from .attachments import Attachment
 from .base import ConfluenceClient
 
 _SEARCH_PATH = f"{API_V1}/search"
@@ -36,7 +37,7 @@ class Page(BaseModel):
     body_storage: str  # Confluence Storage Format (XHTML-like)
     url: str
     parent_id: Optional[str] = None
-    attachments: list[Any] = []  # populated in Phase 5
+    attachments: list[Attachment] = []
 
 
 class PageSummary(BaseModel):
@@ -55,6 +56,7 @@ class PageNode(BaseModel):
     id: str
     title: str
     url: str = ""
+    attachments: list[Attachment] = []  # populated when --attachments is used
     children: list[PageNode] = []
 
 
