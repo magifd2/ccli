@@ -96,7 +96,7 @@ confluence-cli pages tree 123456789 --depth 2 --attachments --output-dir ./downl
 Python 3.11 以上と [uv](https://docs.astral.sh/uv/) が必要です。
 
 ```bash
-git clone https://github.com/magifd2/ccli.git
+git clone https://github.com/magifd2/confluence-cli.git
 cd ccli
 uv sync --all-extras
 ```
