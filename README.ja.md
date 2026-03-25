@@ -87,6 +87,20 @@ confl-cli pages tree 123456789 --page-format json --attachments --output-dir ./d
 
 `--output-dir` が必要。`--attachments` と組み合わせて記事本文と添付ファイルを同時にダウンロード可能。
 
+### `pages tree` JSON フィールド
+
+各ノードには以下のフィールドが含まれます：
+
+| フィールド | 内容 |
+|------------|------|
+| `id` | ページ ID |
+| `title` | ページタイトル |
+| `url` | Web UI URL |
+| `created_at` | 作成日時（UTC ISO 8601） |
+| `updated_at` | 最終更新日時（UTC ISO 8601） |
+| `attachments` | 添付ファイルメタデータ（`--attachments` 指定時に取得） |
+| `children` | 子ページノードの配列 |
+
 ### `pages get` の出力フォーマット
 
 | フラグ | 出力 |

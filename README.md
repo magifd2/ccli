@@ -88,6 +88,20 @@ confl-cli pages tree 123456789 --page-format json --attachments --output-dir ./d
 
 Requires `--output-dir`. Combine with `--attachments` to download both page bodies and attachments.
 
+### JSON fields for `pages tree`
+
+Each node in the JSON output contains:
+
+| Field | Description |
+|-------|-------------|
+| `id` | Page ID |
+| `title` | Page title |
+| `url` | Web UI URL |
+| `created_at` | Creation date (UTC ISO 8601) |
+| `updated_at` | Last modified date (UTC ISO 8601) |
+| `attachments` | Attachment metadata (populated with `--attachments`) |
+| `children` | Nested child nodes |
+
 ### Output formats for `pages get`
 
 | Flag | Output |
