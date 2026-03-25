@@ -1,11 +1,17 @@
 from rich.console import Console
 from rich.table import Table
 
+from ..client.pages import Page, PageSummary
 from ..client.spaces import Space
+from ..converters.html_to_text import html_to_markdown
+
+
+def _console(color: bool) -> Console:
+    return Console(highlight=False, no_color=not color)
 
 
 def print_spaces(spaces: list[Space], *, color: bool = True) -> None:
-    console = Console(highlight=False, no_color=not color)
+    console = _console(color)
     if not spaces:
         console.print("No spaces found.")
         return
@@ -20,3 +26,45 @@ def print_spaces(spaces: list[Space], *, color: bool = True) -> None:
         table.add_row(space.key, space.name, space.type, space.status)
 
     console.print(table)
+
+
+def print_page_summaries(summaries: list[PageSummary], *, color: bool = True) -> None:
+    console = _console(color)
+    if not summaries:
+        console.print("No pages found.")
+        return
+
+    table = Table(show_header=True, header_style="bold" if color else "", box=None, pad_edge=False)
+    table.add_column("ID", min_width=10)
+    table.add_column("SPACE", min_width=8)
+    table.add_column("TITLE", min_width=28)
+    table.add_column("LAST MODIFIED")
+
+    for s in summaries:
+        last_mod = s.last_modified[:10] if s.last_modified else ""
+        table.add_row(s.id, s.space_key, s.title, last_mod)
+
+    console.print(table)
+
+
+def print_page(page: Page, *, color: bool = True) -> None:
+    console = _console(color)
+
+    title_style = "bold" if color else ""
+    meta_style = "dim" if color else ""
+
+    console.print(f"# {page.title}", style=title_style)
+    console.print(
+        f"Space: {page.space_key}  |  Version: {page.version}  |  "
+        f"Updated: {page.updated_at[:10]}  |  Author: {page.author.display_name}",
+        style=meta_style,
+    )
+    if page.url:
+        console.print(page.url, style=meta_style)
+    console.print()
+
+    markdown = html_to_markdown(page.body_html)
+    if markdown:
+        console.print(markdown)
+    else:
+        console.print("(no content)")

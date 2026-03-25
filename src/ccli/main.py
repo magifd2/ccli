@@ -3,11 +3,13 @@ from typing import Optional
 import typer
 
 from .commands.config import config_app
+from .commands.pages import pages_app
 from .commands.spaces import spaces_app
 
 app = typer.Typer(help="Atlassian Confluence CLI")
 app.add_typer(config_app, name="config")
 app.add_typer(spaces_app, name="spaces")
+app.add_typer(pages_app, name="pages")
 
 
 @app.callback(invoke_without_command=True)
