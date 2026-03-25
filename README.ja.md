@@ -96,7 +96,7 @@ ccli pages tree 123456789 --depth 2 --attachments --output-dir ./downloads
 Python 3.11 以上と [uv](https://docs.astral.sh/uv/) が必要です。
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/magifd2/ccli.git
 cd ccli
 uv sync --all-extras
 ```
