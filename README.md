@@ -1,4 +1,4 @@
-# confluence-cli
+# confl-cli
 
 A CLI tool for Atlassian Confluence Cloud.
 
@@ -17,7 +17,7 @@ Designed around the UNIX philosophy — stdout is data, stderr is logs — so it
 ## Installation
 
 ```bash
-uv tool install confluence-cli
+uv tool install confl-cli
 ```
 
 ## Configuration
@@ -35,7 +35,7 @@ Generate an API token at: <https://id.atlassian.com/manage-profile/security/api-
 Or run the interactive setup wizard:
 
 ```bash
-confluence-cli config init
+confl-cli config init
 ```
 
 The config file is stored at `~/.config/ccli/config.toml` (Linux/macOS) or `%APPDATA%\ccli\config.toml` (Windows).
@@ -44,31 +44,31 @@ The config file is stored at `~/.config/ccli/config.toml` (Linux/macOS) or `%APP
 
 ```bash
 # List spaces
-confluence-cli spaces list
+confl-cli spaces list
 
 # Search spaces
-confluence-cli spaces search "Engineering"
+confl-cli spaces search "Engineering"
 
 # Search pages (full-text)
-confluence-cli pages search "Getting Started" --space DEV
+confl-cli pages search "Getting Started" --space DEV
 
 # Get a page as plain text (Markdown-ified)
-confluence-cli pages get 123456789
+confl-cli pages get 123456789
 
 # Get a page as JSON and pipe to jq
-confluence-cli pages get 123456789 --format json | jq '.title'
+confl-cli pages get 123456789 --format json | jq '.title'
 
 # Get a page in Confluence Storage Format (internal XHTML-like source)
-confluence-cli pages get 123456789 --format storage
+confl-cli pages get 123456789 --format storage
 
 # Get a page and download its attachments
-confluence-cli pages get 123456789 --attachments --output-dir ./downloads
+confl-cli pages get 123456789 --attachments --output-dir ./downloads
 
 # Get the full page tree rooted at a page (JSON)
-confluence-cli pages tree 123456789 --format json | jq '.'
+confl-cli pages tree 123456789 --format json | jq '.'
 
 # Get a page tree to depth 2 and download all attachments
-confluence-cli pages tree 123456789 --depth 2 --attachments --output-dir ./downloads
+confl-cli pages tree 123456789 --depth 2 --attachments --output-dir ./downloads
 ```
 
 ### Output formats for `pages get`
@@ -97,7 +97,7 @@ confluence-cli pages tree 123456789 --depth 2 --attachments --output-dir ./downl
 Requires Python 3.11+ and [uv](https://docs.astral.sh/uv/).
 
 ```bash
-git clone https://github.com/magifd2/confluence-cli.git
+git clone https://github.com/magifd2/confl-cli.git
 cd ccli
 uv sync --all-extras
 ```

@@ -34,7 +34,7 @@ uv run ruff format .
 uv run mypy src/
 
 # Run the CLI (development)
-uv run confluence-cli --help
+uv run confl-cli --help
 ```
 
 ## Project Rules
@@ -74,7 +74,7 @@ src/ccli/
 
 ### Key Design Decisions
 
-**stdout/stderr separation**: Data goes to stdout; progress, warnings, and errors go to stderr. This allows `confluence-cli pages get ID --format json | jq '.'` to work correctly.
+**stdout/stderr separation**: Data goes to stdout; progress, warnings, and errors go to stderr. This allows `confl-cli pages get ID --format json | jq '.'` to work correctly.
 
 **tty auto-detection**: When stdout is not a tty (pipe/redirect), color and table formatting are automatically disabled. `--no-color` and the `NO_COLOR` env var also disable it.
 
