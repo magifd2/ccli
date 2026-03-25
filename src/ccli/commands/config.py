@@ -6,7 +6,7 @@ import typer
 from ..config import Config, ConfluenceSettings, get_default_config_path, load_config, save_config
 from ..exceptions import ConfigError
 
-config_app = typer.Typer(help="Manage ccli configuration.")
+config_app = typer.Typer(help="Manage confl-cli configuration.")
 
 
 @config_app.command("init")
