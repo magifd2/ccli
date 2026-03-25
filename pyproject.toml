@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "ccli"
+name = "confluence-cli"
 version = "0.1.0"
 description = "Atlassian Confluence CLI tool"
 readme = "README.md"
@@ -38,7 +38,7 @@ Repository = "https://github.com/magifd2/ccli.git"
 "Bug Tracker" = "https://github.com/magifd2/ccli/issues"
 
 [project.scripts]
-ccli = "ccli.main:app"
+confluence-cli = "ccli.main:app"
 
 [project.optional-dependencies]
 dev = [

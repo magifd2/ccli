@@ -1,4 +1,4 @@
-# ccli
+# confluence-cli
 
 A CLI tool for Atlassian Confluence Cloud.
 
@@ -17,7 +17,7 @@ Designed around the UNIX philosophy — stdout is data, stderr is logs — so it
 ## Installation
 
 ```bash
-uv tool install ccli
+uv tool install confluence-cli
 ```
 
 ## Configuration
@@ -35,7 +35,7 @@ Generate an API token at: <https://id.atlassian.com/manage-profile/security/api-
 Or run the interactive setup wizard:
 
 ```bash
-ccli config init
+confluence-cli config init
 ```
 
 The config file is stored at `~/.config/ccli/config.toml` (Linux/macOS) or `%APPDATA%\ccli\config.toml` (Windows).
@@ -44,31 +44,31 @@ The config file is stored at `~/.config/ccli/config.toml` (Linux/macOS) or `%APP
 
 ```bash
 # List spaces
-ccli spaces list
+confluence-cli spaces list
 
 # Search spaces
-ccli spaces search "Engineering"
+confluence-cli spaces search "Engineering"
 
 # Search pages (full-text)
-ccli pages search "Getting Started" --space DEV
+confluence-cli pages search "Getting Started" --space DEV
 
 # Get a page as plain text (Markdown-ified)
-ccli pages get 123456789
+confluence-cli pages get 123456789
 
 # Get a page as JSON and pipe to jq
-ccli pages get 123456789 --format json | jq '.title'
+confluence-cli pages get 123456789 --format json | jq '.title'
 
 # Get a page in Confluence Storage Format (internal XHTML-like source)
-ccli pages get 123456789 --format storage
+confluence-cli pages get 123456789 --format storage
 
 # Get a page and download its attachments
-ccli pages get 123456789 --attachments --output-dir ./downloads
+confluence-cli pages get 123456789 --attachments --output-dir ./downloads
 
 # Get the full page tree rooted at a page (JSON)
-ccli pages tree 123456789 --format json | jq '.'
+confluence-cli pages tree 123456789 --format json | jq '.'
 
 # Get a page tree to depth 2 and download all attachments
-ccli pages tree 123456789 --depth 2 --attachments --output-dir ./downloads
+confluence-cli pages tree 123456789 --depth 2 --attachments --output-dir ./downloads
 ```
 
 ### Output formats for `pages get`
