@@ -50,22 +50,23 @@ uv run confl-cli --help
 
 ```
 src/ccli/
-├── main.py            # Typer app entry point; registers command groups
+├── main.py            # Typer app entry point; version via importlib.metadata
 ├── config.py          # Config loading: env vars → config file fallback
 ├── auth.py            # Builds authenticated httpx client
 ├── exceptions.py      # Custom exceptions with exit codes
-├── client/            # Confluence REST API v2 wrappers (httpx)
+├── downloader.py      # Streaming file download with retry; safe_attachment_dest
+├── client/            # Confluence REST API wrappers (httpx)
 │   ├── base.py        # Base client: auth, retry, rate-limit handling
-│   ├── spaces.py      # /spaces endpoints
-│   ├── pages.py       # /pages endpoints (search, get, children/tree)
-│   └── attachments.py # /attachments endpoints + streaming download
+│   ├── spaces.py      # v2 /spaces endpoints
+│   ├── pages.py       # v1/v2 /pages endpoints (search, get, tree)
+│   └── attachments.py # v1 /attachments endpoints + streaming download
 ├── commands/          # Typer command definitions (thin layer over client)
 │   ├── spaces.py
 │   ├── pages.py
 │   └── config.py
 ├── formatters/        # Output rendering (text/json/html)
 │   ├── base.py        # Detects tty; routes to appropriate formatter
-│   ├── text.py        # Rich-based colored/table output (tty only)
+│   ├── text.py        # Rich-based colored/table output; UTC→local time conversion
 │   ├── json_fmt.py    # JSON serialization to stdout
 │   └── html_fmt.py    # Raw HTML output
 └── converters/
@@ -82,9 +83,15 @@ src/ccli/
 
 **Error exit codes**: Defined in `exceptions.py` — 1=auth failure, 2=forbidden, 3=not found, 4=network error, 5=rate limit, 6=config error, 99=unexpected. Scripts can branch on these.
 
-**Rate limit retry**: The base client retries on HTTP 429 with exponential backoff (max 3 attempts).
+**Rate limit retry**: The base client retries on HTTP 429 with exponential backoff (max 3 attempts). 5xx and network errors are also retried.
 
 **Attachment storage**: Saved under `<output-dir>/<page-id>/<filename>`. In JSON output, the `saved_path` field reflects the actual saved location.
+
+**Tree API strategy**: `pages tree` uses the v1 REST API for all node metadata — `GET /wiki/rest/api/content/{id}?expand=version,history` for the root and `GET /wiki/rest/api/content/{id}/child/page?expand=version,history` for children. This is the only way to get `version.when` (updated_at), `history.createdDate` (created_at), and `_links.webui` (url) in a single request. The Confluence v2 `/pages/{id}/children` endpoint returns none of these fields.
+
+**Timestamp display**: JSON output always stores raw UTC ISO 8601 strings. Text formatters (`formatters/text.py`) convert to local time via `_local_dt()` using `datetime.astimezone()`.
+
+**Page content download in tree**: `pages tree --page-format <fmt> --output-dir <dir>` saves each page body to `<dir>/<page-id>/page.md|.html|.json|.xml`. Requires `--output-dir`. Compatible with `--attachments`.
 
 ## Key Libraries
 

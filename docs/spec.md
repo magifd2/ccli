@@ -42,84 +42,69 @@ Confluence Cloud の HTTP Basic 認証:
 ## 4. CLI コマンド体系
 
 ```
-ccli [グローバルオプション] <コマンド> <サブコマンド> [引数] [オプション]
+confl-cli [グローバルオプション] <コマンド> <サブコマンド> [引数] [オプション]
 ```
 
 ### グローバルオプション
 
 | オプション | 説明 |
 |-----------|------|
-| `--config PATH` | 設定ファイルのパスを上書き指定 |
-| `--format {text,json,html}` | 出力形式（デフォルト: text） |
 | `--no-color` | カラー出力を無効化 |
-| `--quiet` / `-q` | 進捗・ログを抑制（パイプ利用時の自動判定と同等） |
-| `--version` | バージョン表示 |
+| `--version` | バージョン表示（`importlib.metadata` から動的取得） |
 
 ### 4.1 spaces コマンド
 
-#### `ccli spaces list`
+#### `confl-cli spaces list`
 全スペースを一覧表示する。
 
 ```
-ccli spaces list [--limit N] [--type personal|global]
+confl-cli spaces list [--limit N] [--type personal|global]
 ```
 
 text 出力例:
 ```
-KEY       NAME                     TYPE
-DEV       Development              global
-ARCH      Architecture             global
-~john     John's Space             personal
+KEY       NAME                     TYPE      STATUS
+DEV       Development              global    current
+~john     John's Space             personal  current
 ```
 
-#### `ccli spaces search <query>`
-クエリ文字列でスペースを検索する。
+#### `confl-cli spaces search <query>`
+クエリ文字列でスペースを検索する（クライアントサイドの部分一致）。
 
 ```
-ccli spaces search <query> [--limit N]
+confl-cli spaces search <query> [--limit N]
 ```
 
 ### 4.2 pages コマンド
 
-#### `ccli pages search <query>`
-ページを全文検索する。
+#### `confl-cli pages search <query>`
+ページを全文検索する（CQL）。
 
 ```
-ccli pages search <query> [--space SPACE_KEY] [--limit N]
+confl-cli pages search <query> [--space SPACE_KEY] [--limit N] [--format {text,json}]
 ```
 
-text 出力例:
+text 出力例（日時はローカルタイム `YYYY-MM-DD HH:MM` 形式）:
 ```
 ID          SPACE   TITLE                    LAST MODIFIED
-123456789   DEV     Getting Started Guide    2024-01-15
-987654321   ARCH    System Architecture      2024-01-10
+123456789   DEV     Getting Started Guide    2024-01-15 19:00
+987654321   ARCH    System Architecture      2024-01-10 14:30
 ```
 
-json 出力例:
-```json
-[
-  {
-    "id": "123456789",
-    "space_key": "DEV",
-    "title": "Getting Started Guide",
-    "url": "https://...",
-    "last_modified": "2024-01-15T10:00:00Z"
-  }
-]
-```
-
-#### `ccli pages get <page-id>`
+#### `confl-cli pages get <page-id>`
 指定ページを取得する。
 
 ```
-ccli pages get <page-id> [--format {text,html,json}] [--attachments] [--output-dir DIR]
+confl-cli pages get <page-id> [--format {text,html,json,storage}] [--attachments] [--output-dir DIR]
 ```
 
 | オプション | 説明 |
 |-----------|------|
-| `--format` | `text`=Markdown変換, `html`=生HTML, `json`=構造化データ |
-| `--attachments` | 添付ファイルも取得する |
-| `--output-dir DIR` | 添付ファイルの保存先（未指定時はカレントディレクトリ） |
+| `--format` | `text`=Markdown変換（デフォルト）, `html`=生HTML, `json`=構造化データ, `storage`=Confluence Storage Format |
+| `--attachments` | 添付ファイルメタデータも取得する |
+| `--output-dir DIR` | 添付ファイルをダウンロードして保存 |
+
+テキスト表示のメタ行: `Space: XX  |  Version: N  |  Updated: YYYY-MM-DD HH:MM  |  Author: 氏名`
 
 JSON 出力スキーマ:
 ```json
@@ -129,14 +114,11 @@ JSON 出力スキーマ:
   "space_key": "string",
   "space_name": "string",
   "version": "number",
-  "created_at": "ISO8601",
-  "updated_at": "ISO8601",
-  "author": {
-    "display_name": "string",
-    "email": "string"
-  },
+  "created_at": "ISO8601 UTC",
+  "updated_at": "ISO8601 UTC",
+  "author": { "display_name": "string", "email": "string | null" },
   "body_html": "string",
-  "body_text": "string",
+  "body_storage": "string",
   "url": "string",
   "parent_id": "string | null",
   "attachments": [
@@ -145,50 +127,66 @@ JSON 出力スキーマ:
       "filename": "string",
       "media_type": "string",
       "size_bytes": "number",
+      "download_url": "string",
       "saved_path": "string | null"
     }
   ]
 }
 ```
 
-#### `ccli pages tree <page-id>`
+#### `confl-cli pages tree <page-id>`
 指定ページを起点に子ページを再帰的に取得する。
 
 ```
-ccli pages tree <page-id> [--format {text,json}] [--attachments] [--depth N] [--output-dir DIR]
+confl-cli pages tree <page-id> [--format {text,json}] [--depth N]
+                               [--attachments] [--output-dir DIR]
+                               [--page-format {text,html,json,storage}]
 ```
 
 | オプション | 説明 |
 |-----------|------|
 | `--depth N` | 再帰の最大深さ（デフォルト: 無制限） |
+| `--format` | ツリー構造の出力形式（`text` または `json`） |
 | `--attachments` | 各ページの添付ファイルを取得 |
-| `--output-dir DIR` | 添付ファイル保存先（`<dir>/<page-id>/` 以下に配置） |
+| `--output-dir DIR` | 添付ファイルおよびページ本文の保存先 |
+| `--page-format` | ページ本文の保存形式。`--output-dir` が必須 |
 
-text 出力例（ツリー構造）:
+text 出力例（日時はローカルタイム）:
 ```
-Getting Started (123456789)
-├── Installation (111111111)
-│   └── Docker Setup (222222222)
-└── Configuration (333333333)
-    ├── Basic Config (444444444)
-    └── Advanced Config (555555555)
+Getting Started (123456789)  2024-01-15 19:00
+├── Installation (111111111)  2024-01-12 10:30
+│   └── Docker Setup (222222222)  2024-01-10 09:00
+└── Configuration (333333333)  2024-01-08 15:45
 ```
 
-JSON 出力スキーマ（木構造、各ノードは `pages get` と同じフィールド + `children` 配列）:
+`--page-format` 指定時の保存ファイル:
+
+| 形式 | ファイル名 |
+|------|-----------|
+| `text` | `<output-dir>/<page-id>/page.md` |
+| `html` | `<output-dir>/<page-id>/page.html` |
+| `json` | `<output-dir>/<page-id>/page.json` |
+| `storage` | `<output-dir>/<page-id>/page.xml` |
+
+JSON 出力スキーマ（各ノード）:
 ```json
 {
   "id": "string",
   "title": "string",
-  "children": [ { "id": "...", "title": "...", "children": [] } ]
+  "url": "string",
+  "created_at": "ISO8601 UTC",
+  "updated_at": "ISO8601 UTC",
+  "attachments": [ { "id": "...", "filename": "...", "saved_path": "..." } ],
+  "children": [ { /* 同じ構造 */ } ]
 }
 ```
 
 ### 4.3 config コマンド
 
-#### `ccli config init`
+#### `confl-cli config init`
 対話形式で設定ファイルを初期化する。
 
-#### `ccli config show`
+#### `confl-cli config show`
 現在の設定を表示（API Token はマスキング）。
 
 ## 5. 出力設計（UNIX 哲学）
