@@ -25,8 +25,16 @@ htmlcov/
 *.swp
 *.swo
 
-# OS
+# macOS
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.AppleDouble
+.LSOverride
+
+# Windows
 Thumbs.db
 
 # ccli config (never commit credentials)
